@@ -36,6 +36,13 @@ public class ImageUploadController : Controller
     {
         if (ModelState.IsValid)
         {
+            var contentType = model.ImageFile.ContentType;
+            if (!contentType.StartsWith("image/"))
+            {
+                ViewBag.Message = "File format not supported";
+                return View(model);
+            }
+            
             var imageGuid = Guid.NewGuid().ToString();
             var extension = Path.GetExtension(model.ImageFile.FileName);
             var blobName = $"{imageGuid}{extension}";
