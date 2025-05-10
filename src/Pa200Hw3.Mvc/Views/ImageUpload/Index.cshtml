@@ -1,0 +1,47 @@
+@model ImageUploadViewModel
+
+@{
+    ViewData["Title"] = "Upload Image";
+}
+
+@if (@Model.ProcessedImageUrl != null)
+{
+    <h1>Image is being processed</h1>
+}
+else
+{
+    <h1>Upload Image</h1>
+}
+
+@if (!string.IsNullOrEmpty(ViewBag.Message))
+{
+    <div class="alert alert-info">@ViewBag.Message</div>
+}
+
+<div class="row">
+    <div class="col-md-4">
+        @if (@Model.ProcessedImageUrl != null)
+        {
+            <p>Once the image processing is finished, you will find it at
+                <a href="@Model.ProcessedImageUrl">
+                    @Model.ProcessedImageUrl
+                </a>
+            </p>
+        }
+        else
+        {
+            <form asp-controller="ImageUpload" asp-action="Index" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label asp-for="ImageFile"></label>
+                    <input asp-for="ImageFile" type="file" class="form-control"/>
+                    <span asp-validation-for="ImageFile" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">Upload</button>
+            </form>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
