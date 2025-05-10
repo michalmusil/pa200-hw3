@@ -1,12 +1,12 @@
-using System;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Pa200Hw3.Messages.ImageProcessing;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace Pa200Hw3.ProcessImageFunction;
 
@@ -38,6 +38,7 @@ public class ProcessImageFunction
                 string.IsNullOrEmpty(messageData.ImageGuid))
             {
                 _logger.LogError("Invalid message format received.");
+                await messageActions.CompleteMessageAsync(message);
                 return;
             }
 
@@ -55,17 +56,38 @@ public class ProcessImageFunction
             var processedContainerClient = blobServiceClient.GetBlobContainerClient(_processedImagesContainerName);
             var processedBlobClient = processedContainerClient.GetBlobClient(fileName);
 
-            var x = await processedBlobClient.ExistsAsync();
-            if (x?.Value is true)
+            var alreadyExists = await processedBlobClient.ExistsAsync();
+            if (alreadyExists?.Value is true)
+            {
+                await messageActions.CompleteMessageAsync(message);
                 return;
+            }
+            
+            using var processedImage = await Image.LoadAsync(rawImageStream);
+            processedImage.Mutate(x => x.Grayscale());
+            using var processedImageStream = new MemoryStream();
+            await processedImage.SaveAsync(processedImageStream, processedImage.Metadata.DecodedImageFormat!);
+            processedImageStream.Position = 0;
 
-            await processedBlobClient.UploadAsync(rawImageStream, false);
+
+            await processedBlobClient.UploadAsync(processedImageStream, false);
 
             _logger.LogInformation(
                 $"Successfully processed image {messageData.ImageGuid}");
+
+            await messageActions.CompleteMessageAsync(message);
         }
         catch (Exception ex)
         {
+            try
+            {
+                await messageActions.CompleteMessageAsync(message);
+            }
+            catch(Exception exs)
+            {
+                // ignored
+            }
+
             _logger.LogError($"Error processing image: {ex.Message}");
         }
     }
