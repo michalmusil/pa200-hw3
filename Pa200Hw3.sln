@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pa200Hw3.Messages", "src\Pa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pa200Hw3.Mvc", "src\Pa200Hw3.Mvc\Pa200Hw3.Mvc.csproj", "{9EDC4DCD-D727-4068-A5EC-7D01D22FA821}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pa200Hw3.ProcessImageFunction", "src\Pa200Hw3.ProcessImageFunction\Pa200Hw3.ProcessImageFunction.csproj", "{1A287141-6751-4516-87FB-363EEAD0C850}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{9EDC4DCD-D727-4068-A5EC-7D01D22FA821}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EDC4DCD-D727-4068-A5EC-7D01D22FA821}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EDC4DCD-D727-4068-A5EC-7D01D22FA821}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A287141-6751-4516-87FB-363EEAD0C850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A287141-6751-4516-87FB-363EEAD0C850}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A287141-6751-4516-87FB-363EEAD0C850}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A287141-6751-4516-87FB-363EEAD0C850}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

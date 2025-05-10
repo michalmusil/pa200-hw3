@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Pa200Hw3.ProcessImageFunction": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7226",
+      "launchBrowser": false
+    }
+  }
+}
