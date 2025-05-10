@@ -3,6 +3,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Configuration.AddEnvironmentVariables(prefix: "HW3APP__");
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

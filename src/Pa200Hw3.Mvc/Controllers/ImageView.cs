@@ -19,16 +19,24 @@ public class ImageViewController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var blobServiceClient = new BlobServiceClient(_blobStorageConnectionString);
-        var containerClient = blobServiceClient.GetBlobContainerClient(_processedImagesContainerName);
         List<string> imageUrls = new List<string>();
-
-        await foreach (var blobItem in containerClient.GetBlobsAsync())
+        try
         {
-            BlobClient blobClient = containerClient.GetBlobClient(blobItem.Name);
-            imageUrls.Add(blobClient.Uri.ToString());
-        }
+            var blobServiceClient = new BlobServiceClient(_blobStorageConnectionString);
+            var containerClient = blobServiceClient.GetBlobContainerClient(_processedImagesContainerName);
 
-        return View(new ImageViewViewModel { ImageUrls = imageUrls });
+            await foreach (var blobItem in containerClient.GetBlobsAsync())
+            {
+                BlobClient blobClient = containerClient.GetBlobClient(blobItem.Name);
+                imageUrls.Add(blobClient.Uri.ToString());
+            }
+
+            return View(new ImageViewViewModel { ImageUrls = imageUrls });
+        }
+        catch
+        {
+            ViewBag.Message = "Failed to load images";
+            return View(new ImageViewViewModel { ImageUrls = [] });
+        }
     }
 }
