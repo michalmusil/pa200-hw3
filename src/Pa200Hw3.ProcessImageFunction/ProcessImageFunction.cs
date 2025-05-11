@@ -44,25 +44,23 @@ public class ProcessImageFunction
 
             var extension = Path.GetExtension(messageData.RawImageUrl);
             var fileName = $"{messageData.ImageGuid}{extension}";
-
             var blobServiceClient = new BlobServiceClient(_blobStorageConnectionString);
-            var rawContainerClient = blobServiceClient.GetBlobContainerClient(_rawImagesContainerName);
-            var rawBlobClient = rawContainerClient.GetBlobClient(fileName);
-
-            using var rawImageStream = new MemoryStream();
-            await rawBlobClient.DownloadToAsync(rawImageStream);
-            rawImageStream.Position = 0;
 
             var processedContainerClient = blobServiceClient.GetBlobContainerClient(_processedImagesContainerName);
             var processedBlobClient = processedContainerClient.GetBlobClient(fileName);
-
             var alreadyExists = await processedBlobClient.ExistsAsync();
             if (alreadyExists?.Value is true)
             {
                 await messageActions.CompleteMessageAsync(message);
                 return;
             }
-            
+
+            var rawContainerClient = blobServiceClient.GetBlobContainerClient(_rawImagesContainerName);
+            var rawBlobClient = rawContainerClient.GetBlobClient(fileName);
+            using var rawImageStream = new MemoryStream();
+            await rawBlobClient.DownloadToAsync(rawImageStream);
+            rawImageStream.Position = 0;
+
             using var processedImage = await Image.LoadAsync(rawImageStream);
             processedImage.Mutate(x => x.Grayscale());
             using var processedImageStream = new MemoryStream();
@@ -71,9 +69,7 @@ public class ProcessImageFunction
 
 
             await processedBlobClient.UploadAsync(processedImageStream, false);
-
-            _logger.LogInformation(
-                $"Successfully processed image {messageData.ImageGuid}");
+            _logger.LogInformation($"Successfully processed image {messageData.ImageGuid}");
 
             await messageActions.CompleteMessageAsync(message);
         }
@@ -83,7 +79,7 @@ public class ProcessImageFunction
             {
                 await messageActions.CompleteMessageAsync(message);
             }
-            catch(Exception exs)
+            catch (Exception exs)
             {
                 // ignored
             }
